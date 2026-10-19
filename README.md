@@ -153,7 +153,4 @@ Configure `MONGODB_URI` and `JWT_SECRET` in the deployment platform's environmen
 
 GitHub: https://github.com/24pa1a05d2/FSD2
 
-## Author
-
-**Your Name**
 
