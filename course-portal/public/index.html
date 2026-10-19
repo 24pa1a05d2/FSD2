@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduRate — University Course Rating & Feedback Portal</title>
+  <meta name="description" content="Rate and review your university courses. Help fellow students make better academic decisions. Transparent, honest, verified feedback from real students.">
+  <meta property="og:title" content="EduRate — University Course Rating Portal">
+  <meta property="og:description" content="University course rating and feedback portal for students and instructors.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════════ -->
+<nav class="navbar" id="mainNav">
+  <div class="container">
+    <div class="nav-inner">
+      <div class="nav-logo" onclick="navigate('home')" style="cursor:pointer">
+        <div class="logo-icon">🎓</div>
+        <span>EduRate</span>
+      </div>
+      <div class="nav-links">
+        <span class="nav-link" onclick="navigate('home')" id="nav-home">Home</span>
+        <span class="nav-link" onclick="navigate('courses')" id="nav-courses">Courses</span>
+        <span class="nav-link" onclick="navigate('leaderboard')" id="nav-leaderboard">Leaderboard</span>
+        <span class="nav-link" onclick="navigate('instructors')" id="nav-instructors">Instructors</span>
+        <span class="nav-link" id="nav-dashboard" style="display:none" onclick="navigate('dashboard')">Dashboard</span>
+        <span class="nav-link" id="nav-admin" style="display:none" onclick="navigate('admin')">Admin</span>
+      </div>
+      <div class="nav-actions">
+        <div id="nav-guest" style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="openModal('loginModal')">Login</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('registerModal')">Sign Up</button>
+        </div>
+        <div id="nav-user" style="display:none;align-items:center;gap:12px">
+          <span id="nav-user-name" style="font-weight:600;font-size:.88rem;color:var(--text-secondary)"></span>
+          <div class="nav-avatar" id="navAvatar" onclick="navigate('dashboard')">U</div>
+          <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display:none">
+  <div class="spinner"></div>
+  <p style="color:var(--text-secondary);font-weight:500">Loading...</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: HOME
+════════════════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">🏛️ University Course Portal</div>
+        <h1>Rate Courses.<br><span style="color:var(--accent-light)">Empower</span> Decisions.</h1>
+        <p>The most comprehensive university course rating and feedback platform. Access verified reviews from fellow students, make informed academic choices.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-accent btn-lg" onclick="navigate('courses')">🔍 Browse Courses</button>
+          <button class="btn btn-secondary btn-lg" style="color:white;border-color:rgba(255,255,255,.4)" onclick="openModal('registerModal')">Get Started Free</button>
+        </div>
+        <div class="hero-stats" id="heroStats">
+          <div class="hero-stat"><div class="num" data-target="250">0</div><div class="label">Courses Listed</div></div>
+          <div class="hero-stat"><div class="num" data-target="8500">0</div><div class="label">Student Reviews</div></div>
+          <div class="hero-stat"><div class="num" data-target="45">0</div><div class="label">Departments</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Courses -->
+  <section class="section" style="background:var(--bg)">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">⭐ Top Rated</div>
+        <h2>Featured <span class="text-gradient">Courses</span></h2>
+        <p>Discover the highest-rated courses based on verified student feedback</p>
+      </div>
+      <div class="grid-3" id="featuredCourses">
+        <!-- populated by JS -->
+      </div>
+      <div style="text-align:center;margin-top:40px">
+        <button class="btn btn-secondary btn-lg" onclick="navigate('courses')">View All Courses →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="section" style="background:var(--surface)">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">📋 Process</div>
+        <h2>How <span class="text-gradient">EduRate</span> Works</h2>
+        <p>Simple, transparent, and powerful feedback for the academic community</p>
+      </div>
+      <div class="grid-3" style="gap:32px">
+        <div style="text-align:center;padding:40px 24px">
+          <div style="width:72px;height:72px;border-radius:20px;background:var(--gradient-primary);display:grid;place-items:center;font-size:2rem;margin:0 auto 20px;box-shadow:var(--shadow-primary)">🔐</div>
+          <h3 style="margin-bottom:12px;font-size:1.1rem">1. Register & Enroll</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;line-height:1.7">Create your student account, verify your university email, and enroll in your courses.</p>
+        </div>
+        <div style="text-align:center;padding:40px 24px">
+          <div style="width:72px;height:72px;border-radius:20px;background:var(--gradient-accent);display:grid;place-items:center;font-size:2rem;margin:0 auto 20px;box-shadow:var(--shadow-accent)">⭐</div>
+          <h3 style="margin-bottom:12px;font-size:1.1rem">2. Rate & Review</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;line-height:1.7">Share detailed feedback on content quality, instructor clarity, materials, and assessments.</p>
+        </div>
+        <div style="text-align:center;padding:40px 24px">
+          <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#10b981,#059669);display:grid;place-items:center;font-size:2rem;margin:0 auto 20px;box-shadow:0 8px 30px rgba(16,185,129,.3)">🎯</div>
+          <h3 style="margin-bottom:12px;font-size:1.1rem">3. Make Decisions</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;line-height:1.7">Browse ratings, read reviews, and choose the best courses that match your academic goals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Department Stats -->
+  <section class="section" style="background:var(--gradient-dark);color:white">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag" style="background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:var(--accent-light)">🏛️ Departments</div>
+        <h2 style="color:white">Across All <span style="color:var(--accent-light)">Departments</span></h2>
+        <p style="color:rgba(255,255,255,.6)">Comprehensive coverage of all university faculties and departments</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px" id="deptGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo" style="color:white">
+            <div class="logo-icon">🎓</div>
+            <span style="color:white">EduRate</span>
+          </div>
+          <p>The most trusted university course rating and feedback platform. Empowering students to make better academic decisions since 2024.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <span class="footer-link" onclick="navigate('courses')">Browse Courses</span>
+          <span class="footer-link" onclick="navigate('leaderboard')">Leaderboard</span>
+          <span class="footer-link" onclick="navigate('instructors')">Instructors</span>
+          <span class="footer-link" onclick="navigate('dashboard')">Dashboard</span>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <span class="footer-link">Engineering</span>
+          <span class="footer-link">Mathematics</span>
+          <span class="footer-link">Business</span>
+          <span class="footer-link">Sciences</span>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <span class="footer-link">Help Center</span>
+          <span class="footer-link">Guidelines</span>
+          <span class="footer-link">Privacy Policy</span>
+          <span class="footer-link">Contact Us</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2024 EduRate University Portal. All rights reserved.</span>
+        <span>Built with ❤️ for students</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: COURSES
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-courses" style="padding-top:68px">
+  <div style="background:var(--gradient-primary);padding:48px 0">
+    <div class="container">
+      <h1 style="color:white;font-size:2.2rem;margin-bottom:8px">Course Directory</h1>
+      <p style="color:rgba(255,255,255,.7);margin-bottom:28px">Discover and rate university courses across all departments</p>
+      <div class="search-bar" style="max-width:600px">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="courseSearch" placeholder="Search by course title, code, or keyword..." onkeyup="handleSearchKey(event)">
+        <button class="btn btn-accent btn-sm search-btn" onclick="loadCourses(1)">Search</button>
+      </div>
+    </div>
+  </div>
+  <div class="container" style="padding-top:32px">
+    <div class="filter-bar">
+      <select class="filter-select" id="filterDept" onchange="loadCourses(1)">
+        <option value="">All Departments</option>
+        <option>Computer Science</option>
+        <option>Mathematics</option>
+        <option>Engineering</option>
+        <option>Business</option>
+        <option>Medicine</option>
+        <option>Arts</option>
+        <option>Law</option>
+      </select>
+      <select class="filter-select" id="filterCategory" onchange="loadCourses(1)">
+        <option value="">All Categories</option>
+        <option>Engineering</option>
+        <option>Mathematics</option>
+        <option>Business</option>
+        <option>Science</option>
+        <option>Arts</option>
+        <option>Medicine</option>
+        <option>Law</option>
+      </select>
+      <select class="filter-select" id="filterSemester" onchange="loadCourses(1)">
+        <option value="">All Semesters</option>
+        <option>Fall</option>
+        <option>Spring</option>
+        <option>Summer</option>
+      </select>
+      <select class="filter-select" id="filterSort" onchange="loadCourses(1)">
+        <option value="rating">Top Rated</option>
+        <option value="popular">Most Reviewed</option>
+        <option value="newest">Newest</option>
+        <option value="title">A-Z</option>
+      </select>
+      <span style="margin-left:auto;font-size:.85rem;color:var(--text-muted)" id="courseCount"></span>
+    </div>
+    <div class="grid-3" id="coursesGrid">
+      <div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>
+    </div>
+    <div class="pagination" id="coursesPagination"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: COURSE DETAIL
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-course-detail" style="padding-top:68px">
+  <div id="courseDetailContent"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: LEADERBOARD
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-leaderboard" style="padding-top:68px">
+  <div style="background:var(--gradient-dark);padding:48px 0;text-align:center">
+    <div class="container">
+      <div style="font-size:3rem;margin-bottom:12px">🏆</div>
+      <h1 style="color:white;font-size:2.2rem;margin-bottom:8px">Top Rated Courses</h1>
+      <p style="color:rgba(255,255,255,.6)">The best courses based on student ratings and reviews</p>
+    </div>
+  </div>
+  <div class="container section">
+    <div id="leaderboardList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: INSTRUCTORS
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-instructors" style="padding-top:68px">
+  <div style="background:var(--gradient-primary);padding:48px 0;text-align:center">
+    <div class="container">
+      <h1 style="color:white;font-size:2.2rem;margin-bottom:8px">Our Faculty</h1>
+      <p style="color:rgba(255,255,255,.7)">Meet the dedicated instructors shaping academic excellence</p>
+    </div>
+  </div>
+  <div class="container section">
+    <div class="grid-3" id="instructorsGrid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: INSTRUCTOR DETAIL
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-instructor-detail" style="padding-top:68px">
+  <div id="instructorDetailContent"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: STUDENT DASHBOARD
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-dashboard" style="padding-top:68px">
+  <div class="container" style="padding-top:40px;padding-bottom:60px">
+    <div id="dashboardContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE: ADMIN DASHBOARD
+════════════════════════════════════════════════════ -->
+<div class="page" id="page-admin" style="padding-top:68px">
+  <div class="container" style="padding-top:40px;padding-bottom:60px">
+    <div id="adminContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: LOGIN
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="loginModal" onclick="closeModalOutside(event,'loginModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Welcome Back 👋</h2>
+      <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="loginEmail" class="form-control" placeholder="your@university.edu">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div style="padding:14px;background:var(--surface-2);border-radius:var(--radius);margin-bottom:16px;font-size:.82rem;color:var(--text-secondary)">
+        <strong>Demo accounts:</strong><br>
+        🔴 Admin: admin@university.edu / admin123<br>
+        🔵 Instructor: sarah@university.edu / inst123<br>
+        🟢 Student: alex@student.edu / student123
+      </div>
+    </div>
+    <div class="modal-footer" style="flex-direction:column;gap:12px;align-items:stretch">
+      <button class="btn btn-primary" onclick="doLogin()" id="loginBtn">Sign In</button>
+      <p style="text-align:center;font-size:.85rem;color:var(--text-muted)">
+        No account? <span style="color:var(--primary);cursor:pointer;font-weight:600" onclick="closeModal('loginModal');openModal('registerModal')">Register here</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: REGISTER
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="registerModal" onclick="closeModalOutside(event,'registerModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Create Account 🎓</h2>
+      <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="regName" class="form-control" placeholder="Dr. John Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input type="text" id="regDept" class="form-control" placeholder="Computer Science">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="regEmail" class="form-control" placeholder="your@university.edu">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="regPassword" class="form-control" placeholder="Min. 6 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select id="regRole" class="form-control">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="flex-direction:column;gap:12px;align-items:stretch">
+      <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+      <p style="text-align:center;font-size:.85rem;color:var(--text-muted)">
+        Have an account? <span style="color:var(--primary);cursor:pointer;font-weight:600" onclick="closeModal('registerModal');openModal('loginModal')">Sign in</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: REVIEW FORM
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="reviewModal" onclick="closeModalOutside(event,'reviewModal')">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <h2 class="modal-title">Submit Course Review ✍️</h2>
+      <button class="modal-close" onclick="closeModal('reviewModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="reviewCourseId">
+      <div class="form-group">
+        <label class="form-label">Overall Rating *</label>
+        <div class="star-rating-input" id="overallStars">
+          <span class="star" data-val="1" onclick="setRating('overall',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('overall',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('overall',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('overall',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('overall',5)">★</span>
+        </div>
+        <input type="hidden" id="ratingOverall" value="0">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Content Quality</label>
+          <div class="star-rating-input" id="contentStars">
+            <span class="star" onclick="setRating('content',1)">★</span>
+            <span class="star" onclick="setRating('content',2)">★</span>
+            <span class="star" onclick="setRating('content',3)">★</span>
+            <span class="star" onclick="setRating('content',4)">★</span>
+            <span class="star" onclick="setRating('content',5)">★</span>
+          </div>
+          <input type="hidden" id="ratingContent" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instructor Clarity</label>
+          <div class="star-rating-input" id="clarityStars">
+            <span class="star" onclick="setRating('clarity',1)">★</span>
+            <span class="star" onclick="setRating('clarity',2)">★</span>
+            <span class="star" onclick="setRating('clarity',3)">★</span>
+            <span class="star" onclick="setRating('clarity',4)">★</span>
+            <span class="star" onclick="setRating('clarity',5)">★</span>
+          </div>
+          <input type="hidden" id="ratingClarity" value="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Course Material</label>
+          <div class="star-rating-input" id="materialStars">
+            <span class="star" onclick="setRating('material',1)">★</span>
+            <span class="star" onclick="setRating('material',2)">★</span>
+            <span class="star" onclick="setRating('material',3)">★</span>
+            <span class="star" onclick="setRating('material',4)">★</span>
+            <span class="star" onclick="setRating('material',5)">★</span>
+          </div>
+          <input type="hidden" id="ratingMaterial" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assessments</label>
+          <div class="star-rating-input" id="assessStars">
+            <span class="star" onclick="setRating('assess',1)">★</span>
+            <span class="star" onclick="setRating('assess',2)">★</span>
+            <span class="star" onclick="setRating('assess',3)">★</span>
+            <span class="star" onclick="setRating('assess',4)">★</span>
+            <span class="star" onclick="setRating('assess',5)">★</span>
+          </div>
+          <input type="hidden" id="ratingAssess" value="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Review Title</label>
+        <input type="text" id="reviewTitle" class="form-control" placeholder="Summarize your experience in one line" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Detailed Feedback *</label>
+        <textarea id="reviewComment" class="form-control" rows="4" placeholder="Share your honest experience with this course..." maxlength="1000"></textarea>
+        <div class="form-hint"><span id="charCount">0</span>/1000 characters</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">What Worked Well</label>
+          <textarea id="reviewPros" class="form-control" rows="2" placeholder="Strengths of this course..." maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">What Could Be Better</label>
+          <textarea id="reviewCons" class="form-control" rows="2" placeholder="Areas for improvement..." maxlength="500"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Semester Taken</label>
+          <select id="reviewSemester" class="form-control">
+            <option value="Fall">Fall</option>
+            <option value="Spring">Spring</option>
+            <option value="Summer">Summer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year</label>
+          <select id="reviewYear" class="form-control">
+            <option>2024</option>
+            <option>2023</option>
+            <option>2022</option>
+            <option>2021</option>
+          </select>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.88rem;color:var(--text-secondary)">
+        <input type="checkbox" id="reviewAnonymous" style="width:16px;height:16px;accent-color:var(--primary)">
+        Submit review anonymously
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('reviewModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: ADD COURSE (Instructor/Admin)
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="addCourseModal" onclick="closeModalOutside(event,'addCourseModal')">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <h2 class="modal-title">Add New Course 📚</h2>
+      <button class="modal-close" onclick="closeModal('addCourseModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Course Title *</label>
+          <input type="text" id="newCourseTitle" class="form-control" placeholder="Introduction to Machine Learning">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Course Code *</label>
+          <input type="text" id="newCourseCode" class="form-control" placeholder="CS501">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea id="newCourseDesc" class="form-control" rows="3" placeholder="Comprehensive course description..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Department *</label>
+          <input type="text" id="newCourseDept" class="form-control" placeholder="Computer Science">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select id="newCourseCategory" class="form-control">
+            <option>Engineering</option>
+            <option>Mathematics</option>
+            <option>Business</option>
+            <option>Science</option>
+            <option>Arts</option>
+            <option>Medicine</option>
+            <option>Law</option>
+            <option>Others</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Credits</label>
+          <input type="number" id="newCourseCredits" class="form-control" value="3" min="1" max="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Semester</label>
+          <select id="newCourseSemester" class="form-control">
+            <option>Fall</option>
+            <option>Spring</option>
+            <option>Summer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year</label>
+          <input type="number" id="newCourseYear" class="form-control" value="2024">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" id="newCourseTags" class="form-control" placeholder="Python, ML, AI, Data Science">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addCourseModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitNewCourse()">Create Course</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
